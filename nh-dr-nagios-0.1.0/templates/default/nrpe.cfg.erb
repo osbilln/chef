@@ -1,0 +1,46 @@
+##-------------------------------------------------------------------
+## @copyright 2014 Bill Nguyen
+## File : nrpe.cfg.erb
+## Author : <billn@naehas.com>
+## Description : NRPE Nagios Checks configuration
+## --
+## Created : <2013-9-11>
+## Updated: Time-stamp: <2014-08-18 10:51:57>
+##-------------------------------------------------------------------
+
+log_facility=daemon
+pid_file=/var/run/nagios/nrpe.pid
+server_port=5666
+nrpe_user=nagios
+nrpe_group=nagios
+allowed_hosts=192.168.201.25,192.168.209.21
+dont_blame_nrpe=0
+debug=0
+command_timeout=60
+connection_timeout=300
+include=/etc/nagios/nrpe_local.cfg
+include_dir=/etc/nagios/nrpe.d/
+
+###
+
+command[check_users]=/usr/lib/nagios/plugins/check_users -w 5 -c 10
+command[check_load]=/usr/lib/nagios/plugins/check_load -w 15,10,5 -c 30,25,20
+command[check_disk_root]=/usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /
+command[check_disk_root]=/usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /root
+command[check_disk_data1]=/usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /data1
+command[check_disk_data2]=/usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /data2
+command[check_disk_data3]=/usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /data3
+command[check_disk_data4]=/usr/lib/nagios/plugins/check_disk -w 10% -c 5% -p /data4
+command[check_disk_data5]=/usr/lib/nagios/plugins/check_disk -w 10% -c 5% -p /data5
+command[check_disk_usrjava]=/usr/lib/nagios/plugins/check_disk -w 8% -c 5% -p /usr/java
+command[check_disk_selenium_root]=/usr/lib/nagios/plugins/check_disk -w 30% -c 15% -p /
+command[check_disk_selenium_data1]=/usr/lib/nagios/plugins/check_disk -w 30% -c 15% -p /export/data1
+command[check_zombie_procs]=/usr/lib/nagios/plugins/check_procs -w 5 -c 10 -s Z
+command[check_total_procs]=/usr/lib/nagios/plugins/check_procs -w 150 -c 200 
+command[check_nagios_instance]=/usr/lib/nagios/plugins/check_nagios -F /var/cache/nagios3/status.dat -C /usr/sbin/nagios3 -e 2
+command[check_hda1]=/usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /dev/hda1
+command[check_disk_mysqltmp]=/usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /mysqltmp
+command[check_disk_root]=/usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /
+command[check_zombie_procs]=/usr/lib/nagios/plugins/check_procs -w 5 -c 10 -s Z
+command[check_total_procs]=/usr/lib/nagios/plugins/check_procs -w 150 -c 200 
+command[check_eth0]=/usr/lib/nagios/plugins/check_linux_stats.pl -N -w 7000000 -c 9000000 -p eth0

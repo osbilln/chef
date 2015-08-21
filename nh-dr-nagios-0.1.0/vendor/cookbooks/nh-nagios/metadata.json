@@ -1,0 +1,31 @@
+{
+  "name": "nh-nagios",
+  "description": "Installs/Configures nh-nagios",
+  "long_description": "Deploy customized nagios system\n",
+  "maintainer": "DennyZhang",
+  "maintainer_email": "billn@naehas.com",
+  "license": "All rights reserved",
+  "platforms": {
+  },
+  "dependencies": {
+  },
+  "recommendations": {
+  },
+  "suggestions": {
+  },
+  "conflicting": {
+  },
+  "providing": {
+  },
+  "replacing": {
+  },
+  "attributes": {
+  },
+  "groupings": {
+  },
+  "recipes": {
+  },
+  "version": "0.1.0",
+  "source_url": "",
+  "issues_url": ""
+}

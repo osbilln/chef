@@ -1,0 +1,975 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "VPC Security Groups by Foghorn Consulting",
+  "Parameters" : {
+    "VPC": {
+      "Description" : "Select the VPC to associate with security groups",
+      "Type": "AWS::EC2::VPC::Id"
+    },
+    
+    "OpenVPN": {
+      "Description" : "OpenVPN",
+      "Default" : "Yes",
+      "Type" : "String",
+      "AllowedValues" : ["Yes","No"],
+      "ConstraintDescription" : "Must Choose Yes or No"
+    },
+
+    "DatabasePlatform": {
+      "Description" : "Database Platform",
+      "Default" : "MySQL",
+      "Type" : "String",
+      "AllowedValues" : ["MySQL", "PostGreSQL","MS SQL","Oracle"]
+    },
+
+    "NATSecurityGroup" : {
+      "Description" : "ID of NAT security Group",
+      "Type" : "AWS::EC2::SecurityGroup::Id" 
+    },
+
+    "Supernet": {
+      "Description": "First two octets of private class B supernet",
+      "Type": "String",
+      "Default" : "10.1",
+      "AllowedPattern": "(172\\.3[0-1])|(172.2\\d)|(172.1[6-9])|(10.25[0-4])|(10.2[0-4]\\d)|(10\\.1\\d\\d)|(10\\.\\d\\d)|(10\\.\\d)|(192\\.168)",
+      "ConstraintDescription": "Supernet must be the first two octets of a valid class B private subnet. Eg. 172.16, or 10.25"
+    },
+
+    "IncludeStaging": {
+      "Description": "Include Staging Security Groups",
+      "Type" : "String",
+      "AllowedValues" : ["Yes","No"],
+      "ConstraintDescription" : "Must Choose Yes or No"
+    },
+
+    "IncludeProduction": {
+      "Description" : "Include Production Security Groups",
+      "Type" : "String",
+      "AllowedValues" : ["Yes","No"],
+      "ConstraintDescription" : "Must Choose Yes or No"
+    }
+  },
+
+  "Conditions" : {
+    "condOpenVPN" : {"Fn::Equals" : [{"Ref" : "OpenVPN"}, "Yes"]},
+    "condStaging" : {"Fn::Equals" : [{"Ref" : "IncludeStaging"}, "Yes"]},
+    "condProduction" : {"Fn::Equals" : [{"Ref" : "IncludeProduction"}, "Yes"]},
+    "condMySQL": {"Fn::Equals" : [{"Ref" : "DatabasePlatform"}, "MySQL"]},
+    "condPostGreSQL": {"Fn::Equals" : [{"Ref" : "DatabasePlatform"}, "PostGreSQL"]},
+    "condMSSQL": {"Fn::Equals" : [{"Ref" : "DatabasePlatform"}, "MS SQL"]},
+    "condOracle": {"Fn::Equals" : [{"Ref" : "DatabasePlatform"}, "Oracle"]},
+    "condStagingMySQL": {"Fn::And" : [{"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform"}, "MySQL"]},
+      {"Fn::Equals" : [{"Ref" : "IncludeStaging"}, "Yes"]}
+    ]},
+    "condStagingPostGreSQL": {"Fn::And" : [{"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform"}, "PostGreSQL"]},
+      {"Fn::Equals" : [{"Ref" : "IncludeStaging"}, "Yes"]}
+    ]},  
+    "condStagingOracle": {"Fn::And" : [{"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform"}, "Oracle"]},
+      {"Fn::Equals" : [{"Ref" : "IncludeStaging"}, "Yes"]}
+    ]}, 
+    "condStagingMSSQL": {"Fn::And" : [{"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform"}, "MS SQL"]},
+      {"Fn::Equals" : [{"Ref" : "IncludeStaging"}, "Yes"]}
+    ]},
+    "condProductionMySQL": {"Fn::And" : [{"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform"}, "MySQL"]},
+      {"Fn::Equals" : [{"Ref" : "IncludeProduction"}, "Yes"]}
+    ]},
+    "condProductionPostGreSQL": {"Fn::And" : [{"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform"}, "PostGreSQL"]},
+      {"Fn::Equals" : [{"Ref" : "IncludeProduction"}, "Yes"]}
+    ]},  
+    "condProductionOracle": {"Fn::And" : [{"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform"}, "Oracle"]},
+      {"Fn::Equals" : [{"Ref" : "IncludeProduction"}, "Yes"]}
+    ]}, 
+    "condProductionMSSQL": {"Fn::And" : [{"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform"}, "MS SQL"]},
+      {"Fn::Equals" : [{"Ref" : "IncludeProduction"}, "Yes"]}
+    ]}
+  },
+
+  "Resources" : {
+    "sgVPN": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Condition": "condOpenVPN",
+      "Properties": {
+        "GroupDescription": "VPN Group",
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "VPN"
+          },
+          {
+            "Key": "Environment",
+            "Value": "All"
+          }
+        ], 
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "943",
+            "ToPort": "943",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "udp",
+            "FromPort": "1194",
+            "ToPort": "1194",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "-1",
+            "CidrIp": {"Fn::Join": ["",[
+              { "Ref" : "Supernet" },
+              ".0.0/19"]]
+            }
+          },
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+
+    "sgAppProduction": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Condition" : "condProduction",
+      "Properties": {
+        "GroupDescription": "App-Production",
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "App-Production"
+          },
+          {
+            "Key": "Environment",
+            "Value": "Production"
+          }
+        ]
+      }
+    },
+
+    "sgAppStaging": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Condition" : "condStaging",
+      "Properties": {
+        "GroupDescription": "App-Staging",
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "App-Staging"
+          },
+          {
+            "Key": "Environment",
+            "Value": "Staging"
+          }
+        ]
+      }
+    },
+
+    "sgDBProduction": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Condition" : "condProduction",
+      "Properties": {
+        "GroupDescription": "DB-Production",
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "DB-Production"
+          },
+          {
+            "Key": "Environment",
+            "Value": "Production"
+          }
+        ]
+      }
+    },
+
+    "sgDBStaging": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Condition" : "condStaging",
+      "Properties": {
+        "GroupDescription": "DB-Staging",
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "DB-Staging"
+          },
+          {
+            "Key": "Environment",
+            "Value": "Staging"
+          }
+        ]
+      }
+    },
+
+    "sgHAProxyProduction": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Condition" : "condProduction",
+      "Properties": {
+        "GroupDescription": "HAProxy-Production",
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "HAProxy-Production"
+          },
+          {
+            "Key": "Environment",
+            "Value": "Production"
+          }
+        ]
+      }
+    },
+
+    "sgHAProxyStaging": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Condition" : "condStaging",
+      "Properties": {
+        "GroupDescription": "HAProxy-Staging",
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "HAProxy-Staging"
+          },
+          {
+            "Key": "Environment",
+            "Value": "Staging"
+          }
+        ]
+      }
+    },
+
+    "sgSSH": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "sgSSH",
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sgSSH"
+          },
+          {
+            "Key": "Environment",
+            "Value": "All"
+          }
+        ]
+      }
+    },
+
+    "sgSFTP": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Secure FTP",
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sgSFTP"
+          },
+          {
+            "Key": "Environment",
+            "Value": "All"
+          }
+        ]
+      }
+    },
+
+    "igSFTP22FromAll": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgSFTP"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+
+    "sgALLInternal": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "All Internal Traffic",
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sgAllInternal"
+          },
+          {
+            "Key": "Environment",
+            "Value": "All"
+          }
+        ]
+      }
+    },
+
+    "igAllInternalAllfromAllInternal": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgALLInternal"
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Ref": "sgALLInternal"
+        }
+      }
+    },
+
+    "egAllInternalAlltoAllInternal": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgALLInternal"
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Ref": "sgALLInternal"
+        }
+      }
+    },
+
+    "igAppProduction80fromHAProxy": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condProduction",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "SourceSecurityGroupId": {
+          "Ref": "sgHAProxyProduction"
+        }
+      }
+    },
+
+    "igAppProduction443fromHAProxy": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condProduction",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "SourceSecurityGroupId": {
+          "Ref": "sgHAProxyProduction"
+        }
+      }
+    },
+
+    "igAppStaging80fromHAProxy": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condStaging",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "SourceSecurityGroupId": {
+          "Ref": "sgHAProxyStaging"
+        }
+      }
+    },
+
+    "igAppStaging443fromHAProxy": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condStaging",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "SourceSecurityGroupId": {
+          "Ref": "sgHAProxyStaging"
+        }
+      }
+    },
+
+    "igHAProxyProduction80fromAll": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condProduction",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgHAProxyProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+
+    "igHAProxyProduction443fromAll": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condProduction",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgHAProxyProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+
+    "igHAProxyStaging80fromAll": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condStaging",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgHAProxyStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+
+    "igHAProxyStaging443fromAll": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condStaging",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgHAProxyStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+
+    "igDBProduction3306fromAppProduction": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condProductionMySQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDBProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "3306",
+        "ToPort": "3306",
+        "SourceSecurityGroupId": {
+          "Ref": "sgAppProduction"
+        }
+      }
+    },
+
+    "igDBProduction1521fromAppProduction": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condProductionOracle",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDBProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "1521",
+        "ToPort": "1521",
+        "SourceSecurityGroupId": {
+          "Ref": "sgAppProduction"
+        }
+      }
+    },
+
+    "igDBProduction1433fromAppProduction": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condProductionMSSQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDBProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "1433",
+        "ToPort": "1433",
+        "SourceSecurityGroupId": {
+          "Ref": "sgAppProduction"
+        }
+      }
+    },
+
+    "igDBProduction5432fromAppProduction": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condProductionPostGreSQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDBProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "5432",
+        "ToPort": "5432",
+        "SourceSecurityGroupId": {
+          "Ref": "sgAppProduction"
+        }
+      }
+    },
+
+    "igDBStaging3306fromAppStaging": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition": "condStagingMySQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDBStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "3306",
+        "ToPort": "3306",
+        "SourceSecurityGroupId": {
+          "Ref": "sgAppStaging"
+        }
+      }
+    },
+
+    "igDBStaging1521fromAppStaging": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition": "condStagingOracle",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDBStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "1521",
+        "ToPort": "1521",
+        "SourceSecurityGroupId": {
+          "Ref": "sgAppStaging"
+        }
+      }
+    },
+
+    "igDBStaging1433fromAppStaging": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition": "condStagingMSSQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDBStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "1433",
+        "ToPort": "1433",
+        "SourceSecurityGroupId": {
+          "Ref": "sgAppStaging"
+        }
+      }
+    },
+
+    "igDBStaging5432fromAppStaging": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition": "condStagingPostGreSQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDBStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "5432",
+        "ToPort": "5432",
+        "SourceSecurityGroupId": {
+          "Ref": "sgAppStaging"
+        }
+      }
+    },
+
+    "igAppProduction22fromSSH": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condProduction",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "SourceSecurityGroupId": {
+          "Ref": "sgSSH"
+        }
+      }
+    },
+
+    "igAppStaging22fromSSH": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condStaging",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "SourceSecurityGroupId": {
+          "Ref": "sgSSH"
+        }
+      }
+    },
+
+    "igSSHIngressVPN22": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition": "condOpenVPN",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgSSH"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "SourceSecurityGroupId": {
+          "Ref": "sgVPN"
+        }
+      }
+    },
+
+    "igDBProduction22FromInternap": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condProduction",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDBProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "192.168.201.0/24"
+      }
+    },
+
+    "igAppProduction22FromInternap": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condProduction",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "192.168.201.0/24"
+      }
+    },
+
+    "igHAProxyProduction22FromInternap": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condProduction",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgHAProxyProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "192.168.201.0/24"
+      }
+    },
+
+    "igDBStaging22FromInternap": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condStaging",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDBStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "192.168.201.0/24"
+      }
+    },
+
+    "igAppStaging22FromInternap": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condStaging",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "192.168.201.0/24"
+      }
+    },
+
+    "igHAProxyStaging22FromInternap": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition" : "condStaging",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgHAProxyStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "192.168.201.0/24"
+      }
+    },
+                
+    "egAppProductionEgressNATall": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition" : "condProduction",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppProduction"
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Ref": "NATSecurityGroup"
+        }           
+      }
+    },
+
+    "egAppStagingALLtoNAT": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition" : "condStaging",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppStaging"
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Ref": "NATSecurityGroup"
+        }           
+      }
+    },
+
+    "egAppProduction3306toDBProduction": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition": "condProductionMySQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "3306",
+        "ToPort": "3306",
+        "SourceSecurityGroupId": {
+          "Ref": "sgDBProduction"
+        }           
+      }
+    },
+
+    "egAppProduction1521toDBProduction": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition": "condProductionOracle",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "1521",
+        "ToPort": "1521",
+        "SourceSecurityGroupId": {
+          "Ref": "sgDBProduction"
+        }           
+      }
+    },
+
+    "egAppProduction1433toDBProduction": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition": "condProductionMSSQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "1433",
+        "ToPort": "1433",
+        "SourceSecurityGroupId": {
+          "Ref": "sgDBProduction"
+        }           
+      }
+    },
+
+    "egAppProduction5432toDBProduction": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition": "condProductionPostGreSQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "5432",
+        "ToPort": "5432",
+        "SourceSecurityGroupId": {
+          "Ref": "sgDBProduction"
+        }           
+      }
+    },
+
+    "egAppStaging3306toDBStaging": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition": "condStagingMySQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "3306",
+        "ToPort": "3306",
+        "SourceSecurityGroupId": {
+          "Ref": "sgDBStaging"
+        }           
+      }
+    },
+
+    "egAppStaging1521toDBStaging": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition": "condStagingOracle",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "1521",
+        "ToPort": "1521",
+        "SourceSecurityGroupId": {
+          "Ref": "sgDBStaging"
+        }           
+      }
+    },
+
+    "egAppStaging1433toDBStaging": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition": "condStagingMSSQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "1433",
+        "ToPort": "1433",
+        "SourceSecurityGroupId": {
+          "Ref": "sgDBStaging"
+        }           
+      }
+    },
+
+    "egAppStaging5432toDBStaging": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition": "condStagingPostGreSQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgAppStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "5432",
+        "ToPort": "5432",
+        "SourceSecurityGroupId": {
+          "Ref": "sgDBStaging"
+        }           
+      }
+    },
+
+    "egHAProxyProduction80toAppProduction": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition" : "condProduction",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgHAProxyProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "SourceSecurityGroupId": {
+          "Ref": "sgAppProduction"
+        }           
+      }
+    },
+
+    "egHAProxyProductio443toAppProduction": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition" : "condProduction",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgHAProxyProduction"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "SourceSecurityGroupId": {
+          "Ref": "sgAppProduction"
+        }           
+      }
+    },
+
+    "egHAProxyStaging80AppStaging": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition" : "condStaging",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgHAProxyStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "SourceSecurityGroupId": {
+          "Ref": "sgAppStaging"
+        }           
+      }
+    },
+
+    "egHAProxyStaging443toAppStaging": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition" : "condStaging",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgHAProxyStaging"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "SourceSecurityGroupId": {
+          "Ref": "sgAppStaging"
+        }           
+      }
+    }
+  }
+}

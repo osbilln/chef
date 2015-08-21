@@ -1,0 +1,6 @@
+source "https://supermarket.getchef.com"
+
+cookbook 'apt', github: "opscode-cookbooks/apt", tag: "v2.3.10"
+cookbook 'hostname', '~> 0.3.0'
+
+metadata

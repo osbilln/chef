@@ -1,0 +1,52 @@
+{
+    "description": "Appthority Ubuntu 14.04 ElasticSearch base",
+     "variables": {
+        "account_id": "555985193053",
+        "aws_access_key": "",
+        "aws_secret_key": "",
+        "ec2_region" : "us-west-2",
+        "es_security_group": "",
+        "env": "",
+        "s3_bucket": "naehas-operations/dr-amis",
+        "x509_cert_path": "",
+        "x509_key_path": "",
+        "itype": "c3.large",
+        "v_type": "paravirtual",
+        "ami" : ""
+    }, 
+    "builders": [
+    {
+        "name": "elasticsearch-base-ebs",
+        "type": "amazon-ebs",
+        "ami_name": "nagios-{{ isotime | clean_ami_name }}",
+        "instance_type": "{{user `itype`}}",
+        "ami_virtualization_type": "{{user `v_type`}}",
+        "region": "us-west-2",
+        "source_ami": "{{user `ami`}}",
+        "ssh_username": "ubuntu"
+    }],
+    "provisioners": [
+    {
+        "type": "shell",
+        "inline": [
+        "sudo mkdir -p /etc/chef/ohai/hints/",
+        "sudo touch /etc/chef/ohai/hints/ec2.json"
+        ]
+    },
+    {
+        "type": "chef-solo",
+        "cookbook_paths":["vendor/cookbooks"],
+        "run_list": [
+            "apt::default",
+            "hostname::default",
+            "nh-dr-nagios::nagios_server",
+            "nh-dr-nagios::mysql_repl_check" 
+        ],
+        "json" : { 
+            "apt" : { "compiletime" : true},
+            "set_fqdn" : "nagios-server.naehas.net"
+        }
+    }
+]}
+
+
