@@ -81,8 +81,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.run_list = [
         "recipe[apt::default]",
         "recipe[hostname::default]",
-        "recipe[nh-dr-nagios::nagios_server]",
-        "recipe[nh-dr-nagios::mysql_repl_check]"
+        "recipe[nh-nagios::nagios_server]",
+        "recipe[nh-nagios::mysql_repl_check]"
     ]
   end
 end

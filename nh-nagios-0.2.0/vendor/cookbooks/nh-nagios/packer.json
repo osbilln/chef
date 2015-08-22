@@ -39,8 +39,8 @@
         "run_list": [
             "apt::default",
             "hostname::default",
-            "nh-dr-nagios::nagios_server",
-            "nh-dr-nagios::mysql_repl_check" 
+            "nh-nagios::nagios_server",
+            "nh-nagios::mysql_repl_check" 
         ],
         "json" : { 
             "apt" : { "compiletime" : true},
