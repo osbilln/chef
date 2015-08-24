@@ -210,27 +210,6 @@
       }
     },
 
-    "sgDBReadOnlyProduction": {
-      "Type": "AWS::EC2::SecurityGroup",
-      "Condition" : "condProduction",
-      "Properties": {
-        "GroupDescription": "DBReadOnly-Production",
-        "VpcId": {
-          "Ref": "VPC"
-        },
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "DBReadOnly-Production"
-          },
-          {
-            "Key": "Environment",
-            "Value": "Production"
-          }
-        ]
-      }
-    },
-
     "sgDBStaging": {
       "Type": "AWS::EC2::SecurityGroup",
       "Condition" : "condStaging",
@@ -325,26 +304,6 @@
           {
             "Key": "Name",
             "Value": "sgSFTP"
-          },
-          {
-            "Key": "Environment",
-            "Value": "All"
-          }
-        ]
-      }
-    },
-
-    "sgNagios": {
-      "Type": "AWS::EC2::SecurityGroup",
-      "Properties": {
-        "GroupDescription": "Nagios",
-        "VpcId": {
-          "Ref": "VPC"
-        },
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "sgNagios"
           },
           {
             "Key": "Environment",
@@ -723,68 +682,6 @@
       }
     },
 
-    "igDBProductionAllFromInternap": {
-      "Type": "AWS::EC2::SecurityGroupIngress",
-      "Condition" : "condProduction",
-      "Properties": {
-        "GroupId": {
-          "Ref": "sgDBProduction"
-        },
-        "IpProtocol": "-1",
-        "CidrIp": "192.168.201.0/24"
-      }
-    },
-
-    "igDBProductionAllFromInternapVPN": {
-      "Type": "AWS::EC2::SecurityGroupIngress",
-      "Condition" : "condProduction",
-      "Properties": {
-        "GroupId": {
-          "Ref": "sgDBProduction"
-        },
-        "IpProtocol": "-1",
-        "CidrIp": "192.168.200.0/24"
-      }
-    },
-
-    "igDBReadOnlyProductionAllFromInternap": {
-      "Type": "AWS::EC2::SecurityGroupIngress",
-      "Condition" : "condProduction",
-      "Properties": {
-        "GroupId": {
-          "Ref": "sgDBReadOnlyProduction"
-        },
-        "IpProtocol": "-1",
-        "CidrIp": "192.168.201.0/24"
-      }
-    },
-
-    "igDBReadOnlyProductionAllFromInternapVPN": {
-      "Type": "AWS::EC2::SecurityGroupIngress",
-      "Condition" : "condProduction",
-      "Properties": {
-        "GroupId": {
-          "Ref": "sgDBReadOnlyProduction"
-        },
-        "IpProtocol": "-1",
-        "CidrIp": "192.168.200.0/24"
-      }
-    },
-
-    "igDBReadOnlyProduction22FromInternap": {
-      "Type": "AWS::EC2::SecurityGroupIngress",
-      "Condition" : "condProduction",
-      "Properties": {
-        "GroupId": {
-          "Ref": "sgDBReadOnlyProduction"
-        },
-        "IpProtocol": "tcp",
-        "FromPort": "22",
-        "ToPort": "22",
-        "CidrIp": "192.168.201.0/24"
-      }
-    },
-
     "igAppProduction22FromInternap": {
       "Type": "AWS::EC2::SecurityGroupIngress",
       "Condition" : "condProduction",
@@ -895,22 +792,6 @@
         "ToPort": "3306",
         "SourceSecurityGroupId": {
           "Ref": "sgDBProduction"
-        }           
-      }
-    },
-
-    "egNagios3306toDBReadOnlyProduction": {
-      "Type": "AWS::EC2::SecurityGroupEgress",
-      "Condition": "condProductionMySQL",
-      "Properties": {
-        "GroupId": {
-          "Ref": "sgNagios"
-        },
-        "IpProtocol": "tcp",
-        "FromPort": "3306",
-        "ToPort": "3306",
-        "SourceSecurityGroupId": {
-          "Ref": "sgDBReadOnlyProduction"
         }           
       }
     },
