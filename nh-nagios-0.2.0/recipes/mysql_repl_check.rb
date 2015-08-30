@@ -9,8 +9,36 @@ package "mysql-client" do
   action :install
 end
 
+package "ruby" do 
+  action :install
+end
+
 cookbook_file "/usr/lib/nagios/plugins/check_mysql_slavestatus.sh" do
   source "check_mysql_slavestatus.sh"
+  owner "nagios"
+  group "nagios"
+  mode "0755"
+  action :create
+end
+
+cookbook_file "/usr/lib/nagios/plugins/drdb1_check_max_ids.sh" do
+  source "drdb1_check_max_ids.sh"
+  owner "nagios"
+  group "nagios"
+  mode "0755"
+  action :create
+end
+
+cookbook_file "/usr/lib/nagios/plugins/drdb2_check_max_ids.sh" do
+  source "drdb2_check_max_ids.sh"
+  owner "nagios"
+  group "nagios"
+  mode "0755"
+  action :create
+end
+
+cookbook_file "/usr/lib/nagios/plugins/check_max_id.rb" do
+  source "check_max_id.rb"
   owner "nagios"
   group "nagios"
   mode "0755"

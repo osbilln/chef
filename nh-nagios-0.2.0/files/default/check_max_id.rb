@@ -29,7 +29,7 @@ end
 
 tables_to_check.split.each do |table|
   if max_ids[table][:repl] != max_ids[table][:master]
-    put "descrepancy found on #{table} replication max_id => #{max_ids[table][:repl]} master max_id => #{max_ids[table][:repl]}"
+    put "descrepancy found on #{DB_NAME}.#{table} replication max_id => #{max_ids[table][:repl]} master max_id => #{max_ids[table][:repl]}"
     exit(1)
   end
 end

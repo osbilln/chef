@@ -34,7 +34,7 @@ puts "Dumping to #{DUMP_DIR}/#{DB_NAME}_skipped.sql.gz"
 `mysqldump --single-transaction --quick --flush-logs --master-data -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} #{TABLES_TO_IGNORE} | gzip -1 >  #{DUMP_DIR}/#{DB_NAME}_skipped.sql.gz`
 
 puts "copying to $S3_BUCKET"
-#`s3cmd --force put #{DUMP_DIR}/#{DB_NAME}.sql.gz s3://$S3_BUCKET/#{DB_NAME}.sql.gz`
+`s3cmd --force put #{DUMP_DIR}/#{DB_NAME}_skipped.sql.gz s3://$S3_BUCKET/#{DB_NAME}_skipped.sql.gz`
 
 #puts "dump #{DB_NAME} to S3 complete" #, removing local dump file"
 #rm -f #{DUMP_DIR}/#{DB_NAME}.sql.gz
