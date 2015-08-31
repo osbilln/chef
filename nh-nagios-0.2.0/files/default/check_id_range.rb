@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 if ARGV.count != 7
-  puts "check_max_id.rb usage: <db_name> <repl_db_host> <repl_db_user> <repl_db_pw> <master_db_host> <master_db_user> <master_db_pw>"
+  puts "check_id_range.rb usage: <db_name> <repl_db_host> <repl_db_user> <repl_db_pw> <master_db_host> <master_db_user> <master_db_pw>"
   exit
 end
 
@@ -23,18 +23,22 @@ tables_to_check.split.each do |table|
   id_col = `echo "show columns from #{table} like 'ID';" | mysql -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} -A -s`
   if id_col.empty? # skip if no ID column
     repl_max_id = master_max_id = 0
+    repl_min_id = master_min_id = 0
   else
     repl_max_id = `echo "select MAX(id) as max_id from #{table};" | mysql -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} -A -s`.strip
+    repl_min_id = `echo "select MIN(id) as max_id from #{table};" | mysql -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} -A -s`.strip
     master_max_id = `echo "select MAX(id) as max_id from #{table};" | mysql -u #{DB_MASTER_USER} -p#{DB_MASTER_PW} -h #{DB_MASTER_HOST} #{DB_NAME} -A -s`.strip
+    master_min_id = `echo "select MIN(id) as max_id from #{table};" | mysql -u #{DB_MASTER_USER} -p#{DB_MASTER_PW} -h #{DB_MASTER_HOST} #{DB_NAME} -A -s`.strip
   end  
-  max_ids[table] = {:repl => repl_max_id, :master => master_max_id}
+  max_ids[table] = {:repl => { :max_id => repl_max_id, :min_id => repl_min_id}, :master => { :max_id => master_max_id, :min_id => master_min_id}}
 end
 
 #puts max_ids.inspect
 
 output = ""
 tables_to_check.split.each do |table|
-  if max_ids[table][:master].to_i - max_ids[table][:repl].to_i > 10
+  if (max_ids[table][:master][:max_id].to_i - max_ids[table][:repl][:max_id].to_i > 10) ||
+     (max_ids[table][:master][:min_id].to_i - max_ids[table][:repl][:min_id].to_i > 10)
     #puts "descrepancy found on #{DB_NAME}.#{table} replication max_id => #{max_ids[table][:repl]} master max_id => #{max_ids[table][:master]}"
     output << "#{DB_NAME}.#{table} "
     # exit(1)
