@@ -15,10 +15,12 @@ REPL_DB_USER = MASTER_DB_USER = ARGV[1]
 REPL_DB_PW = MASTER_DB_PW = ARGV[2]
 
 if REPL_DB_HOST.include?("drdb1")
-    MASTER_DB_HOST = "db8.naehas.net"
+    #MASTER_DB_HOST = "db8.naehas.net"
+    MASTER_DB_HOST = "db5.naehas.net" # internap master
     dbs = "salesdemo dmiplatform dmiplatform_staging"
 else
-    MASTER_DB_HOST = "db2.naehas.net"
+    #MASTER_DB_HOST = "db2.naehas.net"
+    MASTER_DB_HOST = "db7.naehas.net" # internap master
     dbs = "citinew_staging comcastprod comcastprod_staging coxprod coxprod_staging usbankprod usbankprod_staging"
 end 
 
@@ -34,9 +36,9 @@ dbs.split.each do |db|
 end
 
 if result.empty?
-    puts "max ids match between #{REPL_DB_HOST.split('.')[0]} and #{MASTER_DB_HOST.split('.')[0]}"
+    puts "id ranges match between #{REPL_DB_HOST.split('.')[0]} and #{MASTER_DB_HOST.split('.')[0]}"
 else
-    puts "discrepancies: #{result}"
+    puts "#{REPL_DB_HOST.split('.')[0]} and #{MASTER_DB_HOST.split('.')[0]} diff: #{result}"
 end
 
 exit(0)
