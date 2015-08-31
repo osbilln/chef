@@ -20,19 +20,30 @@ max_ids = {}
 
 # get max current max id for each table
 tables_to_check.split.each do |table| 
-  repl_max_id = `echo "select MAX(id) as max_id from #{table};" | mysql -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} -A -s`.strip
-  master_max_id = `echo "select MAX(id) as max_id from #{table};" | mysql -u #{DB_MASTER_USER} -p#{DB_MASTER_PW} -h #{DB_MASTER_HOST} #{DB_NAME} -A -s`.strip
+  id_col = `echo "show columns from #{table} like 'ID';" | mysql -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} -A -s`
+  if id_col.empty? # skip if no ID column
+    repl_max_id = master_max_id = 0
+  else
+    repl_max_id = `echo "select MAX(id) as max_id from #{table};" | mysql -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} -A -s`.strip
+    master_max_id = `echo "select MAX(id) as max_id from #{table};" | mysql -u #{DB_MASTER_USER} -p#{DB_MASTER_PW} -h #{DB_MASTER_HOST} #{DB_NAME} -A -s`.strip
+  end  
   max_ids[table] = {:repl => repl_max_id, :master => master_max_id}
 end
 
 #puts max_ids.inspect
 
+output = ""
 tables_to_check.split.each do |table|
-  if max_ids[table][:repl] != max_ids[table][:master]
-    put "descrepancy found on #{DB_NAME}.#{table} replication max_id => #{max_ids[table][:repl]} master max_id => #{max_ids[table][:repl]}"
-    exit(1)
+  if max_ids[table][:master].to_i - max_ids[table][:repl].to_i > 10
+    #puts "descrepancy found on #{DB_NAME}.#{table} replication max_id => #{max_ids[table][:repl]} master max_id => #{max_ids[table][:master]}"
+    output << "#{DB_NAME}.#{table} "
+    # exit(1)
   end
 end
 
-puts "max ids match"
+if output.empty?    
+  puts "max ids match"
+else
+  puts "#{output}"
+end
 exit(0)
