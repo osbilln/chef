@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
-if ARGV.count != 7
-  puts "check_id_range.rb usage: <db_name> <repl_db_host> <repl_db_user> <repl_db_pw> <master_db_host> <master_db_user> <master_db_pw>"
+if ARGV.count != 8
+  puts "check_id_range.rb usage: <db_name> <repl_db_host> <repl_db_user> <repl_db_pw> <master_db_host> <master_db_user> <master_db_pw> <max_diff>"
   exit
 end
 
@@ -12,6 +12,7 @@ DB_PW = ARGV[3]
 DB_MASTER_HOST = ARGV[4]
 DB_MASTER_USER = ARGV[5]
 DB_MASTER_PW = ARGV[6]
+max_diff = ARGV[7]
 
 #tables_to_check = `echo "show tables from #{DB_NAME};" | mysql -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} -A -s`
 tables_to_check = `echo "show tables where tables_in_#{DB_NAME} like 'N\_%' and tables_in_#{DB_NAME} not like 'N\_DATA\_MAPPINGS%' and tables_in_#{DB_NAME} not like 'N\_%\_AUD%';" | mysql -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} -A -s `
@@ -37,8 +38,8 @@ end
 
 output = ""
 tables_to_check.split.each do |table|
-  if (max_ids[table][:master][:max_id].to_i - max_ids[table][:repl][:max_id].to_i > 10) ||
-     (max_ids[table][:master][:min_id].to_i - max_ids[table][:repl][:min_id].to_i > 10)
+  if (max_ids[table][:master][:max_id].to_i - max_ids[table][:repl][:max_id].to_i > max_diff) ||
+     (max_ids[table][:master][:min_id].to_i - max_ids[table][:repl][:min_id].to_i > max_diff)
     #puts "descrepancy found on #{DB_NAME}.#{table} replication max_id => #{max_ids[table][:repl]} master max_id => #{max_ids[table][:master]}"
     output << "#{DB_NAME}.#{table} "
     # exit(1)

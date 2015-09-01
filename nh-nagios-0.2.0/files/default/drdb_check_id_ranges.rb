@@ -25,7 +25,7 @@ end
 ## now loop through the above array
 result = ""
 dbs.split.each do |db|
-    status = `/usr/lib/nagios/plugins/check_id_range.rb #{db} #{REPL_DB_HOST} #{REPL_DB_USER} #{REPL_DB_PW} #{MASTER_DB_HOST} #{MASTER_DB_USER} #{MASTER_DB_PW}`
+    status = `/usr/lib/nagios/plugins/check_id_range.rb #{db} #{REPL_DB_HOST} #{REPL_DB_USER} #{REPL_DB_PW} #{MASTER_DB_HOST} #{MASTER_DB_USER} #{MASTER_DB_PW} 50`
     #puts "checking ids on #{db} => #{status}"
 
     if !status.include?("max ids match")

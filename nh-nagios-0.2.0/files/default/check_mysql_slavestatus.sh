@@ -102,6 +102,10 @@ do
 	esac
 done
 
+## Override warn and critical delays as nagios isn't handling more then 3 args
+warn_delay=14400
+crit_delay=28800
+
 # Connect to the DB server and check for informations
 #########################################################################
 # Check whether all required arguments were passed in
