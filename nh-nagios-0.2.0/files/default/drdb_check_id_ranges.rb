@@ -15,12 +15,10 @@ REPL_DB_USER = MASTER_DB_USER = ARGV[1]
 REPL_DB_PW = MASTER_DB_PW = ARGV[2]
 
 if REPL_DB_HOST.include?("drdb1")
-    #MASTER_DB_HOST = "db8.naehas.net"
-    MASTER_DB_HOST = "db5.naehas.net" # internap master
+    MASTER_DB_HOST = "db8.naehas.net" #internap slave
     dbs = "salesdemo dmiplatform dmiplatform_staging"
 else
-    #MASTER_DB_HOST = "db2.naehas.net"
-    MASTER_DB_HOST = "db7.naehas.net" # internap master
+    MASTER_DB_HOST = "db2.naehas.net" # internap salve
     dbs = "citinew_staging comcastprod comcastprod_staging coxprod coxprod_staging usbankprod usbankprod_staging"
 end 
 
