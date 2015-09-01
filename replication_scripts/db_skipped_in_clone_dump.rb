@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 if ARGV.count != 6
-  puts "db_clone_dump.rb usage: <db_name> <db_host> <db_user> <db_pw> <dump dir> <bucket location>"
+  puts "db_skipped_in_clone_dump.rb usage: <db_name> <db_host> <db_user> <db_pw> <dump dir> <bucket location>"
   exit
 end
 
@@ -28,13 +28,31 @@ TABLES_DUMPED_IN_CLONE.split.each do |table|
   TABLES_TO_IGNORE << "--ignore-table=#{DB_NAME}." << table + " " 
 end
 
+
 #puts "Backing up #{DB_NAME} : #{TABLES_TO_IGNORE}"
 
-puts "Dumping to #{DUMP_DIR}/#{DB_NAME}_skipped.sql.gz"
-`mysqldump --single-transaction --quick --flush-logs --master-data -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} #{TABLES_TO_IGNORE} | gzip -1 >  #{DUMP_DIR}/#{DB_NAME}_skipped.sql.gz`
-
-puts "copying to $S3_BUCKET"
-`s3cmd --force put #{DUMP_DIR}/#{DB_NAME}_skipped.sql.gz s3://$S3_BUCKET/#{DB_NAME}_skipped.sql.gz`
+if TABLES_TO_IGNORE.split.count > 2000
+  TABLES_TO_IGNORE1 = ""
+  TABLES_TO_IGNORE2 = "" 
+  cnt = 0
+  TABLES_TO_IGNORE.split.each do |ignore_table|
+    if cnt < 1000
+      TABLES_TO_IGNORE1 << "#{ignore_table} "
+    else
+      TABLES_TO_IGNORE2 << "#{ignore_table} "
+    end 
+    cnt += 1
+  end
+  puts "Dumping to #{DUMP_DIR}/#{DB_NAME}_skipped1.sql.gz"
+  `mysqldump --single-transaction --quick --flush-logs --master-data -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} #{TABLES_TO_IGNORE1} | gzip -1 >  #{DUMP_DIR}/#{DB_NAME}_skipped1.sql.gz`
+  puts "Dumping to #{DUMP_DIR}/#{DB_NAME}_skipped2.sql.gz"
+  `mysqldump --single-transaction --quick --flush-logs --master-data -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} #{TABLES_TO_IGNORE2} | gzip -1 >  #{DUMP_DIR}/#{DB_NAME}_skipped2.sql.gz`
+else
+  puts "Dumping to #{DUMP_DIR}/#{DB_NAME}_skipped.sql.gz"
+  `mysqldump --single-transaction --quick --flush-logs --master-data -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} #{TABLES_TO_IGNORE} | gzip -1 >  #{DUMP_DIR}/#{DB_NAME}_skipped.sql.gz`
+end
+#puts "copying to $S3_BUCKET"
+#`s3cmd --force put #{DUMP_DIR}/#{DB_NAME}_skipped.sql.gz s3://$S3_BUCKET/#{DB_NAME}_skipped.sql.gz`
 
 #puts "dump #{DB_NAME} to S3 complete" #, removing local dump file"
 #rm -f #{DUMP_DIR}/#{DB_NAME}.sql.gz
