@@ -44,12 +44,12 @@ if TABLES_TO_IGNORE.split.count > 2000
     cnt += 1
   end
   puts "Dumping to #{DUMP_DIR}/#{DB_NAME}_skipped1.sql.gz"
-  `mysqldump --single-transaction --quick --flush-logs --master-data -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} #{TABLES_TO_IGNORE1} | gzip -1 >  #{DUMP_DIR}/#{DB_NAME}_skipped1.sql.gz`
+  `mysqldump --single-transaction --quick --flush-logs --master-data=2 -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} #{TABLES_TO_IGNORE1} | gzip -1 >  #{DUMP_DIR}/#{DB_NAME}_skipped1.sql.gz`
   puts "Dumping to #{DUMP_DIR}/#{DB_NAME}_skipped2.sql.gz"
-  `mysqldump --single-transaction --quick --flush-logs --master-data -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} #{TABLES_TO_IGNORE2} | gzip -1 >  #{DUMP_DIR}/#{DB_NAME}_skipped2.sql.gz`
+  `mysqldump --single-transaction --quick --flush-logs --master-data=2 -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} #{TABLES_TO_IGNORE2} | gzip -1 >  #{DUMP_DIR}/#{DB_NAME}_skipped2.sql.gz`
 else
   puts "Dumping to #{DUMP_DIR}/#{DB_NAME}_skipped.sql.gz"
-  `mysqldump --single-transaction --quick --flush-logs --master-data -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} #{TABLES_TO_IGNORE} | gzip -1 >  #{DUMP_DIR}/#{DB_NAME}_skipped.sql.gz`
+  `mysqldump --single-transaction --quick --flush-logs --master-data=2 -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} #{TABLES_TO_IGNORE} | gzip -1 >  #{DUMP_DIR}/#{DB_NAME}_skipped.sql.gz`
 end
 #puts "copying to $S3_BUCKET"
 #`s3cmd --force put #{DUMP_DIR}/#{DB_NAME}_skipped.sql.gz s3://$S3_BUCKET/#{DB_NAME}_skipped.sql.gz`

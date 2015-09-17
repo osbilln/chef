@@ -16,7 +16,7 @@ S3_BUCKET=$6
 echo "Dumping database $DB_NAME@$DB_HOST"
 
 echo "Dumping to $DUMP_DIR/$DB_NAME.sql.gz"
-mysqldump --single-transaction --quick --flush-logs --master-data --routines -u $DB_USER -p$DB_PW -h $DB_HOST $DB_NAME | gzip -9 >  $DUMP_DIR/$DB_NAME.sql.gz
+mysqldump --single-transaction --quick --flush-logs --master-data=2 --routines -u $DB_USER -p$DB_PW -h $DB_HOST $DB_NAME | gzip -9 >  $DUMP_DIR/$DB_NAME.sql.gz
 
 echo "copying to s3://$S3_BUCKET"
 s3cmd --force put $DUMP_DIR/$DB_NAME.sql.gz s3://$S3_BUCKET/$DB_NAME.sql.gz
