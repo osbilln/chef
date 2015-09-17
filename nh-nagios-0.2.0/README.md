@@ -57,9 +57,15 @@ vagrant destroy
 ```
 
 ##Creating AMIs
-The following script will create an nagios-server ami on the Naehas DR account, which can be use to spin up a running and configured nagios server.
+The following script will create an nagios-server ami on the Naehas DR account, which can be used to spin up a running and configured nagios server.
 
 ./create_ami.sh <aws access key> <aws secret key>
+
+###Mysql Users & Privledges for Nagios checks
+
+on master
+mysql>create user 'check_id_range'@'%' identified by 'Uuzehau4Aa';
+mysql>GRANT SELECT ON *.* TO 'check_id_range'@'%';
 
 
 ## License and Authors
