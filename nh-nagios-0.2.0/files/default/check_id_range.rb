@@ -17,6 +17,11 @@ max_diff = ARGV[7]
 #tables_to_check = `echo "show tables from #{DB_NAME};" | mysql -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} -A -s`
 tables_to_check = `echo "show tables where tables_in_#{DB_NAME} like 'N\_%' and tables_in_#{DB_NAME} not like 'N\_DATA\_MAPPINGS%' and tables_in_#{DB_NAME} not like 'N\_%\_AUD%';" | mysql -u #{DB_USER} -p#{DB_PW} -h #{DB_HOST} #{DB_NAME} -A -s `
 
+if tables_to_check.empty?
+  puts "ERROR: unable to get table list, likely due to connection error"
+  exit(1)
+end
+
 max_ids = {}
 
 # get max current max id for each table

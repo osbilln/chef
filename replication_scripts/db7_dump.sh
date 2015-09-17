@@ -20,6 +20,8 @@ do
    # or do whatever with individual element of the array
 done
 
+puts "finished"
+
 
 
 
