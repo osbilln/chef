@@ -24,7 +24,7 @@ TABLES_TO_DUMP="$NAEHAS_TABLES $ENVERS_AUDIT_TABLES $ACL_TABLES $LOOKUPS $VIEWS"
 echo "Backing up $DB_NAME : $TABLES_TO_DUMP"
 
 echo "Dumping to $DUMP_DIR/$DB_NAME.sql.gz"
-mysqldump --single-transaction --quick --flush-logs --master-data -u $DB_USER -p$DB_PW -h $DB_HOST $DB_NAME $TABLES_TO_DUMP | gzip -1 >  $DUMP_DIR/$DB_NAME.sql.gz
+mysqldump --single-transaction --quick --flush-logs --master-data=2 -u $DB_USER -p$DB_PW -h $DB_HOST $DB_NAME $TABLES_TO_DUMP | gzip -1 >  $DUMP_DIR/$DB_NAME.sql.gz
 
 #echo "copying to $S3_BUCKET"
 #s3cmd --force put $DUMP_DIR/$DB_NAME.sql.gz s3://$S3_BUCKET/$DB_NAME.sql.gz
