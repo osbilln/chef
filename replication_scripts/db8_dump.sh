@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-dbs=("mysql" "dmiplatform" "dmiplatform_bonita_core" "dmiplatform_bonita_history" "pncprod" "salesdemo")
+dbs=("mysql" "dmiplatform" "dmiplatform_bonita_core" "dmiplatform_bonita_history" "pncprod" "salesdemo" "statefarm_staging")
 
 ## now loop through the above array
 for i in "${dbs[@]}"
