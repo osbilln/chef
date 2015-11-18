@@ -1,0 +1,10 @@
+*~
+*#
+.#*
+\#*#
+.*.sw[a-z]
+*.un~
+pkg/
+.DS_Store
+
+.vagrant

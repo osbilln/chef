@@ -1,3 +1,15 @@
+- name: Install rubygems
+  sudo: yes
+  apt: name=rubygems state=present
+
+- name: install json gem
+  sudo: yes
+  gem: name=json state=latest
+
+- name: install logger gem
+  sudo: yes
+  gem: name=logger state=latest
+
 - name: volume snapshot script
   copy: src=./files/vol_snapshot.rb dest={{ app_dir }}/scripts/vol_snapshot.rb force=true owner={{ app_user }} group={{ app_group}} mode=0755
 

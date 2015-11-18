@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby
+#!/usr/bin/ruby1.9.1
 
 require 'logger'
 require 'json'
@@ -10,26 +10,29 @@ if ARGV.count < 2
   exit
 end
 
-volume_name = ARGV[0]
+volume_id = ARGV[0]
 snapshot_name_prefix = ARGV[1]
 snapshot_description = snapshot_name_prefix + " volume"
-log = Logger.new("/home/ubuntu/dr_control/log/#{snapshot_name_prefix}_vol_snapshot.log")
+log = Logger.new("/home/ubuntu/dr_control/logs/#{snapshot_name_prefix}_vol_snapshot.log")
 date = Time.now.strftime("%Y%m%d")
-snapshot_name += "_#{date}" # add date to snapshot name prefix
+snapshot_name = "#{snapshot_name_prefix}_#{date}" # add date to snapshot name prefix
 
 # create snapshot
-snapshot = `aws ec2 create-snapshot --volume-id #{volume_id} --description #{snapshot_description}`
+log.info("aws command => aws ec2 create-snapshot --volume-id #{volume_id} --description '#{snapshot_description}'")
+snapshot = `aws ec2 create-snapshot --volume-id #{volume_id} --description '#{snapshot_description}'`
 snapshot_id = JSON.parse(snapshot)["SnapshotId"]
-log.info("snapshot: #{snapshot_id} created of volume: #{volume_id}")
+log.info("snapshot: #{snapshot_id} created from volume: #{volume_id}")
 
 # tag the snapshot
+log.info("aws command => aws ec2 create-tags --resources #{snapshot_id} --tags Key=Name,Value=#{snapshot_name}")
 `aws ec2 create-tags --resources #{snapshot_id} --tags Key=Name,Value=#{snapshot_name}`
 
 # delete snapshot from 8 days ago
 past_date = (DateTime.now - 8).strftime("%Y%m%d")
 
 # find snapshot from past_date
-manifest = `aws ec2 describe-snapshots --filters Name=name,Values=#{snapshot_name_prefix}_#{past_date}`
+log.info("aws command => aws ec2 describe-snapshots --filters Name=tag-value,Values=#{snapshot_name_prefix}_#{past_date}")
+manifest = `aws ec2 describe-snapshots --filters Name=tag-value,Values=#{snapshot_name_prefix}_#{past_date}`
 snapshots =  JSON.parse(manifest)["Snapshots"]
 
 if snapshots.empty?
@@ -37,6 +40,6 @@ if snapshots.empty?
 else
   # pull snapshot id
   old_snapshot_id = snapshots[0]["SnapshotId"]
-  log.info("deleting snapshot #{old_snapshot_id}")
+  log.info("aws command => aws ec2 delete-snapshot --snapshot-id #{old_snapshot_id} ")
   `aws ec2 delete-snapshot --snapshot-id #{old_snapshot_id}`
 end
