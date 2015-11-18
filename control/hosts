@@ -1,0 +1,3 @@
+[drbuild]
+172.16.126.63 ansible_connection=ssh ansible_user=ubuntu
+

@@ -1,8 +1,6 @@
-# elasticsearch_base-cookbook
+# nh-nagios-0.2.0
 
-For General ElasticSearch cluster admin see wiki => http://wiki.appthority.com/ElasticSearch-Cluster
-
-Base chef recipe configuration + packer build script to create a EC2 base AMI for Appthority.
+Base chef recipe configuration + vagrant + packer build script to create a nagios server base AMI for Naheas.
 
 ### Local Setup
 

@@ -1,0 +1,21 @@
+- name: add-apt-repository ppa:awstools-dev/awstools
+  sudo: yes
+  apt_repository: repo='ppa:awstools-dev/awstools'
+
+#- name: Install awscli package not available for ubuntu12.04
+#  sudo: yes
+#  apt: name=awscli state=present
+
+- name: download awscli bundled installer
+  get_url: url=https://s3.amazonaws.com/aws-cli/awscli-bundle.zip dest=/tmp/awscli-bundle.zip
+
+- name: unzip awscli bundled installer
+  unarchive: src=/tmp/awscli-bundle.zip dest=/tmp copy=no
+
+- name: run awscli bundled installer
+  sudo: yes
+  command: /tmp/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws 
+
+- name: cleanup install
+  sudo: yes
+  command: rm -rf /tmp/awscli-bundle*
