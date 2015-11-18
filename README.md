@@ -4,7 +4,7 @@ Naehas DR Repo
 
 Cloudformation template for the Naehas DR VPC security groups
 
-###control
+###ansible-control
 
 Ansible playbook to configure the drbuild instance to manage DR and control DR cutover
 
