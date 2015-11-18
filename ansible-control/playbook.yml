@@ -1,12 +1,13 @@
-- hosts: drbuild
+- hosts: all
   remote_user: ubuntu 
   vars:
     app_user: ubuntu
     app_group: ubuntu
-    app_dir: /home/{{ ubuntu }}/dr_control
+    app_dir: /home/{{ app_user }}/dr_control
     drdb1_data_vol_id: vol-b23bf9a7
     drdb2_data_vol_id: vol-85d73244
   tasks:
+    - include: "tasks/base.yml"
     - include: "tasks/app.yml"
     - include: "tasks/aws_cli.yml"
     - include: "tasks/vol_snapshot.yml"
