@@ -1,0 +1,2 @@
+- name: instance resize script
+  copy: src=./files/instance_resize.rb dest={{ app_dir }}/scripts/instance_resize.rb force=true owner={{ app_user }} group={{ app_group}} mode=0755

@@ -26,3 +26,10 @@
 - name: cleanup install
   sudo: yes
   command: rm -rf /tmp/awscli-bundle*
+
+- name: ensure .aws directory
+  file: path=/home/{{ app_user }}/.aws owner={{ app_user }} group={{ app_group }} state=directory
+
+- name: set the aws sdk config
+  template: src=templates/aws_config dest=/home/{{ app_user }}/.aws/config owner={{ app_user }} group={{ app_group }} mode=0600
+  

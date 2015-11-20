@@ -1,3 +1,7 @@
+- name: Update APT cache
+  sudo: yes
+  apt: update_cache=yes
+
 - name: Install software-properties-common
   sudo: yes
   apt: name=software-properties-common state=present
@@ -8,7 +12,7 @@
 
 - name: Install ruby1.9.1
   sudo: yes
-  apt: name=ruby1.9.1 state=present
+  apt: name=ruby1.9.1-dev state=present
 
 - name: install unzip
   sudo: yes
