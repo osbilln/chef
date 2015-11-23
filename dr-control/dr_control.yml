@@ -1,0 +1,38 @@
+## This playbook will setup the dr control instance specified in the hosts_dr_crontrol file w/ necessary script to perform a full DR cutover when executed.
+- hosts: drcontrol
+  remote_user: ubuntu 
+  vars:
+    app_user: ubuntu
+    app_group: ubuntu
+    app_dir: /home/{{ app_user }}/dr_control
+    drdb1:
+      vol_id: vol-b23bf9a7
+      ip: 172.16.98.21
+      instance_id: i-98bd3841
+      itype: m3.2xlarge
+    drdb2:
+      vol_id: vol-85d73244
+      ip: 172.16.123.222
+      instance_id: i-2ebd38f7
+      itype: m3.2xlarge
+    dr_mysql_pass: n3admin
+    drweb1:
+      itype: t2.large
+      instance_id: i-91ce1b58
+      ip: 172.16.3.12
+      dashboard_dbhosts:
+        citinew-dashboard: drdb2.naehas.net
+        comcastprod-dashboard: drdb2.naehas.net
+        coxprod-dashboard: drdb2.naehas.net
+        dmiplatform-dashboard: drdb1.neahas.net
+        pncprod-dashboard: drdb1.naehas.net
+        salesdemo-dashboard: drdb1.naeahas.net
+        usbankprod-dashboard: drdb2.naehas.net
+    aws_region: us-west-2
+  tasks:
+    - include: "tasks/base.yml"
+    - include: "tasks/app.yml"
+    - include: "tasks/aws_cli.yml"
+    - include: "tasks/ruby_gems.yml"
+    - include: "tasks/vol_snapshot.yml"
+    - include: "tasks/dr_control_setup.yml"

@@ -1,0 +1,3 @@
+- name: set {{ db_host }} my.cnf for promtion
+  sudo: yes
+  template: src=templates/{{ db_host }}_master.my.cnf dest=/etc/mysql/master.my.cnf owner=root group=root mode=0644

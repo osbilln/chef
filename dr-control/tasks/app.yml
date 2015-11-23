@@ -1,0 +1,21 @@
+# Deploy related
+- name: Ensure app_dir
+  file: path={{ app_dir }} owner={{ app_user }} group={{ app_group }} state=directory
+  sudo: yes
+
+- name: Ensure scripts directory
+  file: path={{ app_dir }}/scripts owner={{ app_user }} group={{ app_group }} state=directory
+  sudo: yes
+
+- name: Ensure config directory
+  file: path={{ app_dir }}/config owner={{ app_user }} group={{ app_group }} state=directory
+  sudo: yes
+
+- name: Ensure pids directory
+  file: path={{ app_dir }}/pids owner={{ app_user }} group={{ app_group }} state=directory
+
+- name: Ensure keys directory
+  file: path={{ app_dir }}/keys owner={{ app_user }} group={{ app_group }} state=directory
+
+- name: Ensure logs directory
+  file: path={{ app_dir }}/logs owner={{ app_user }} group={{ app_group }} state=directory

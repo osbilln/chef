@@ -1,0 +1,5 @@
+- name: add dr_control to authorized_key file
+  authorized_key: user={{ app_user }} key="{{ lookup('file', './files/dr_control_id_rsa.pub') }}"
+
+- name: disable strict host checking
+  copy: src=./files/ssh_config dest=/home/{{ app_user }}/.ssh/config force=true owner={{ app_user }} group={{ app_group }} mode=0644

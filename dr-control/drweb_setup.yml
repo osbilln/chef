@@ -1,0 +1,9 @@
+- hosts: drweb
+  remote_user: ubuntu 
+  vars:
+    app_user: ubuntu
+    app_group: ubuntu
+    aws_region: us-west-2
+  tasks:
+    - include: "tasks/aws_cli.yml"
+    - include: "tasks/dr_ssh_access.yml"

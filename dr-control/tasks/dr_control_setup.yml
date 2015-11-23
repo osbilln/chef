@@ -1,0 +1,12 @@
+- name: instance resize script
+  copy: src=./files/instance_resize.rb dest={{ app_dir }}/scripts/instance_resize.rb force=true owner={{ app_user }} group={{ app_group}} mode=0755
+
+- name: copy drdb1 master my.cnf config file
+  copy: src=./files/drdb1_master.my.cnf dest={{ app_dir }}/config/drdb1_master.my.cnf owner={{ app_user }} group={{ app_group }} mode=0644
+
+- name: copy drdb2 master my.cnf config file
+  copy: src=./files/drdb2_master.my.cnf dest={{ app_dir }}/config/drdb2_master.my.cnf owner={{ app_user }} group={{ app_group }} mode=0644
+
+- name: dr_cutover script
+  template: src=./templates/dr_cutover.rb dest={{ app_dir }}/scripts/dr_cutover.rb force=true owner={{ app_user }} group={{ app_group }} mode=0755
+
