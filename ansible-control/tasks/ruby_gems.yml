@@ -1,8 +1,0 @@
-- name: install json gem
-  gem: name=json state=latest
-
-- name: install logger gem
-  gem: name=logger state=latest
-
-- name: install aws-sdk gem
-  gem: name=aws-sdk version=2.2.0 state=present

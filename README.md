@@ -1,8 +1,8 @@
 Naehas DR Repo
 
-###ansible-control
+###dr-control
 
-Ansible playbook to configure the drbuild instance to manage DR and control DR cutover
+Ansible playbook to configure the dr_control instance to manage DR and automate cutover
 
 ###cloudformation
 

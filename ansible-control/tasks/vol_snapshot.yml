@@ -1,8 +1,0 @@
-- name: volume snapshot script
-  copy: src=./files/vol_snapshot.rb dest={{ app_dir }}/scripts/vol_snapshot.rb force=true owner={{ app_user }} group={{ app_group}} mode=0755
-
-- name: setup drdb1 data volume snapshot cron
-  cron: name="snapshot drdb1_data2 volume" minute="0" hour="7" job="{{ app_dir }}/scripts/vol_snapshot.rb {{ drdb1_data_vol_id }} drdb1_data2" user={{ app_user }}
-
-- name: setup drdb1 data volume snapshot cron
-  cron: name="snapshot drdb2_data2 volume" minute="0" hour="7" job="{{ app_dir }}/scripts/vol_snapshot.rb {{ drdb2_data_vol_id }} drdb2_data2" user={{ app_user }}
