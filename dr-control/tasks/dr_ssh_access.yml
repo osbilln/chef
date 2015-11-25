@@ -1,5 +1,15 @@
-- name: add dr_control to authorized_key file
+- name: add dr_control public key to {{app_user}} authorized_key file
   authorized_key: user={{ app_user }} key="{{ lookup('file', './files/dr_control_id_rsa.pub') }}"
 
 - name: disable strict host checking
   copy: src=./files/ssh_config dest=/home/{{ app_user }}/.ssh/config force=true owner={{ app_user }} group={{ app_group }} mode=0644
+
+- stat: path=/home/naehas
+  register: naehas
+
+- name: add dr_control public key to naehas authority_key file
+  sudo: yes
+  authorized_key: user=naehas  key="{{ lookup('file', './files/dr_control_id_rsa.pub') }}"
+  when: naehas.stat.isdir is defined and naehas.stat.isdir
+
+

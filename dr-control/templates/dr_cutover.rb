@@ -44,8 +44,8 @@ def set_master_mycnf(db_host, ip)
 end
 
 def switch_db_host(drweb_host, dashboard_dir, dbhost_new)
-#  `ssh -o "StrictHostKeyChecking no" ubuntu@{drweb_host} "sed -i 's/^dbHost=.*/dbHost=#{dbhost_new}/' /usr/java/#{dashboard_dir}/base-dashboard.properties"`
-#  `ssh -o "StrictHostKeyChecking no" ubuntu@{drweb_host} "/usr/java/#{dashboard_dir}/bin/start.sh"`
+  `ssh -o "StrictHostKeyChecking no" naehas@#{drweb_host} "sed -i 's/^dbHost=.*/dbHost=#{dbhost_new}/' /usr/java/#{dashboard_dir}/base-dashboard.properties"`
+  `ssh -o "StrictHostKeyChecking no" naehas@#{drweb_host} "/usr/java/#{dashboard_dir}/bin/start.sh"`
 end
 
 
@@ -72,6 +72,12 @@ else
   puts "ok proceeding..."
 end
 
+puts "update my.cnf on drdb1..."
+set_master_mycnf("drdb1", "{{ drdb1.ip }}")
+
+puts "update my.cnf on drdb2..."
+set_master_mycnf("drdb2", "{{ drdb2.ip }}")
+
 puts "Stopping mysql on drdb1..."
 stop_mysql("{{ drdb1.ip }}")
 
@@ -84,17 +90,7 @@ scale_up("{{ drdb1.instance_id }}", "{{ drdb1.itype }}")
 puts "scaling up drdb2 instance..."
 scale_up("{{ drdb2.instance_id }}", "{{ drdb2.itype }}")
 
-puts "update my.cnf on drdb1..."
-set_master_mycnf("drdb1", "{{ drdb1.ip }}")
-
-puts "update my.cnf on drdb2..."
-set_master_mycnf("drdb2", "{{ drdb2.ip }}")
-
-puts "Starting mysql on drdb1..."
-start_mysql("{{ drdb1.ip }}")
-
-puts "Starting mysql on drdb2..."
-start_mysql("{{ drdb2.ip }}")
+sleep(60)
 
 puts "Promote slave to master on drdb1..."
 promote_slave("{{ drdb1.ip }}", mysql_password)
@@ -111,7 +107,7 @@ puts "switching dr dashboards to drdb1 and drdb2"
 
 {% for (key, value) in drweb1.dashboard_dbhosts.iteritems() %}
 puts "switching {{ key }} to {{ value }}"
-switch_db_host("{{drweb1.ip}}", "{{ value}}", "{{ key }}")
+switch_db_host("{{drweb1.ip}}", "{{ key }}", "{{ value }}")
 
 {% endfor %}
 
