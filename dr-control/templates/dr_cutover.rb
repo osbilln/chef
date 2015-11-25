@@ -45,7 +45,7 @@ end
 
 def switch_db_host(drweb_host, dashboard_dir, dbhost_new)
   `ssh -o "StrictHostKeyChecking no" naehas@#{drweb_host} "sed -i 's/^dbHost=.*/dbHost=#{dbhost_new}/' /usr/java/#{dashboard_dir}/base-dashboard.properties"`
-  `ssh -o "StrictHostKeyChecking no" naehas@#{drweb_host} "/usr/java/#{dashboard_dir}/bin/start.sh"`
+  `ssh -o "StrictHostKeyChecking no" naehas@#{drweb_host} "/usr/java/#{dashboard_dir}/bin/startup.sh"`
 end
 
 
