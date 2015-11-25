@@ -7,3 +7,4 @@
   tasks:
     - include: "tasks/aws_cli.yml"
     - include: "tasks/dr_ssh_access.yml"
+    - include: "tasks/drdb.yml"

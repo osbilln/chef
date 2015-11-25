@@ -1,0 +1,2 @@
+- name: promote to master script
+  copy: src=./files/promote_to_master.sh dest=/home/{{ app_user }}/promote_to_master.sh force=true owner={{ app_user }} group={{ app_group }} mode=0755

@@ -32,9 +32,7 @@ def scale_up(instance_id, itype)
 end
 
 def promote_slave(ip, password)
-  `ssh -o "StrictHostKeyChecking no" ubuntu@#{ip} mysql -u root -h localhost -p#{password} mysql -e "stop slave;"`
-  `ssh -o "StrictHostKeyChecking no" ubuntu@#{ip} mysql -u root -h localhost -p#{password} mysql -e "change master to MASTER_HOST=''"`
-  `ssh -o "StrictHostKeyChecking no" ubuntu@#{ip} mysql -u root -h localhost -p#{password} mysql -e "reset slave;"`
+  `ssh -o "StrictHostKeyChecking no" ubuntu@#{ip} ./promote_to_master.sh #{password}`
 end
 
 def set_master_mycnf(db_host, ip)
