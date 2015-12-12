@@ -2,7 +2,7 @@ Ansible playbook to configure a server w/ the necessary scripts and cronjobs to 
 
 ###DR Cutover
 
-1. ssh into dr_control instance
+1. ssh into drcontrol instance
 2. cd ~/dr_control/scripts
 3. ./dr_cutover <mysql password for DRDB1 and DRDB2>
 
