@@ -20,13 +20,13 @@
       instance_id: i-91ce1b58
       ip: 172.16.3.12
       dashboard_dbhosts:
-        citinew-dashboard: drdb2.naehas.net
-        comcastprod-dashboard: drdb2.naehas.net
-        coxprod-dashboard: drdb2.naehas.net
-        dmiplatform-dashboard: drdb1.neahas.net
-        pncprod-dashboard: drdb1.naehas.net
-        salesdemo-dashboard: drdb1.naeahas.net
-        usbankprod-dashboard: drdb2.naehas.net
+        citinew-dashboard: drdb2-slave.naehas.net
+        comcastprod-dashboard: drdb2-slave.naehas.net
+        coxprod-dashboard: drdb2-slave.naehas.net
+        dmiplatform-dashboard: drdb1-slave.neahas.net
+        pncprod-dashboard: drdb1-slave.naehas.net
+        salesdemo-dashboard: drdb1-slave.naeahas.net
+        usbankprod-dashboard: drdb2-slave.naehas.net
     aws_region: us-west-2
   tasks:
     - include: "tasks/base.yml"
