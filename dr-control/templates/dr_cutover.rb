@@ -93,6 +93,8 @@ sleep(60)
 puts "Promote slave to master on drdb1..."
 promote_slave("{{ drdb1.ip }}", mysql_password)
 
+sleep(60)
+
 puts "Promote slave to master on drdb2..."
 promote_slave("{{ drdb2.ip }}", mysql_password)
 
