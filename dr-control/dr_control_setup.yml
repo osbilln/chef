@@ -26,6 +26,7 @@
         dmiplatform-dashboard: drdb1-slave.neahas.net
         pncprod-dashboard: drdb1-slave.naehas.net
         salesdemo-dashboard: drdb1-slave.naeahas.net
+        statefarm-dashboard: drdb1-slave.naehas.net
         usbankprod-dashboard: drdb2-slave.naehas.net
     aws_region: us-west-2
   tasks:

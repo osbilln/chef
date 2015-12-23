@@ -43,7 +43,7 @@ end
 
 def switch_db_host(drweb_host, dashboard_dir, dbhost_new)
   `ssh -o "StrictHostKeyChecking no" naehas@#{drweb_host} "sed -i 's/^dbHost=.*/dbHost=#{dbhost_new}/' /usr/java/#{dashboard_dir}/base-dashboard.properties"`
-  `ssh -o "StrictHostKeyChecking no" naehas@#{drweb_host} "PRGDIR=/usr/java/#{dashboard_dir} /usr/java/#{dashboard_dir}/bin/startup.sh"`
+  `ssh -o "StrictHostKeyChecking no" naehas@#{drweb_host} "cd /usr/java/#{dashboard_dir};./bin/startup.sh"`
 end
 
 
@@ -93,7 +93,7 @@ sleep(60)
 puts "Promote slave to master on drdb1..."
 promote_slave("{{ drdb1.ip }}", mysql_password)
 
-sleep(60)
+sleep(30)
 
 puts "Promote slave to master on drdb2..."
 promote_slave("{{ drdb2.ip }}", mysql_password)
