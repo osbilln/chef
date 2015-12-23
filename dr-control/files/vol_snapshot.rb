@@ -4,7 +4,7 @@ require 'logger'
 require 'json'
 require 'date'
 
-# snaphot volume_id keeping last 7 days
+# snaphot volume_id keeping last 2 days
 if ARGV.count < 2
   puts "vol_snapshot.rb usage: <volume_id> <snapshot name prefix>"
   exit
@@ -27,8 +27,8 @@ log.info("snapshot: #{snapshot_id} created from volume: #{volume_id}")
 log.info("aws command => aws ec2 create-tags --resources #{snapshot_id} --tags Key=Name,Value=#{snapshot_name}")
 `aws ec2 create-tags --resources #{snapshot_id} --tags Key=Name,Value=#{snapshot_name}`
 
-# delete snapshot from 8 days ago
-past_date = (DateTime.now - 8).strftime("%Y%m%d")
+# delete snapshot from 2 days ago
+past_date = (DateTime.now - 2).strftime("%Y%m%d")
 
 # find snapshot from past_date
 log.info("aws command => aws ec2 describe-snapshots --filters Name=tag-value,Values=#{snapshot_name_prefix}_#{past_date}")
@@ -36,7 +36,7 @@ manifest = `aws ec2 describe-snapshots --filters Name=tag-value,Values=#{snapsho
 snapshots =  JSON.parse(manifest)["Snapshots"]
 
 if snapshots.empty?
-  log.info("snapshot from 8 days ago not found")
+  log.info("snapshot from 2 days ago not found")
 else
   # pull snapshot id
   old_snapshot_id = snapshots[0]["SnapshotId"]
