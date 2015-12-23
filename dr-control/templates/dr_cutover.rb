@@ -61,7 +61,7 @@ end
 mysql_password = ARGV[0]
 
 # check that the user wants to proceed
-puts "You are about to promote the DR infrastructure to be master, are your sure ? [Y|N]"
+puts "You are about to promote the DR infrastructure to be master, are you sure ? [Y|N]"
 response = $stdin.gets.chomp.downcase
 if response != 'y'
   puts "ok exiting"
