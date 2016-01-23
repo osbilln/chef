@@ -30,13 +30,13 @@ end
 
 instance.stop # stop instance
 
-# wait until instance has stopped up to 5 minutes checking every 10 seconds 
+# wait until instance has stopped up to 10 minutes checking every 10 seconds 
 ec2.client.wait_until(:instance_stopped, {:instance_ids => [ instance_id ]}) do |w|
   # seconds between each attempt
   w.interval = 10
  
   # maximum number of polling attempts before giving up
-  w.max_attempts = 30
+  w.max_attempts = 60
 end
 
 instance = ec2.instance(instance_id) # reinitialize instance resource to get current state
@@ -50,13 +50,13 @@ instance.modify_attribute(instance_type: { value: itype })
 
 instance.start # restart instance
 
-# wait until instance has stopped up to 5 minutes checking every 10 seconds 
+# wait until instance has stopped up to 10 minutes checking every 10 seconds 
 ec2.client.wait_until(:instance_running, instance_ids: ["#{instance_id}"]) do |w|
   # seconds between each attempt
   w.interval = 10
  
   # maximum number of polling attempts before giving up
-  w.max_attempts = 30
+  w.max_attempts = 60
 end
 
 instance = ec2.instance(instance_id) # reinitialize instance resource to get current state

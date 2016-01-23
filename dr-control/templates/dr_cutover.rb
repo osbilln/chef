@@ -43,6 +43,21 @@ end
 
 def switch_db_host(drweb_host, dashboard_dir, dbhost_new)
   `ssh -o "StrictHostKeyChecking no" naehas@#{drweb_host} "sed -i 's/^dbHost=.*/dbHost=#{dbhost_new}/' /usr/java/#{dashboard_dir}/base-dashboard.properties"`
+
+  if dbhost_new.include?("db2")
+    search = "db7-service"
+  else
+    search = "db5-service"
+  end
+
+  `ssh -o "StrictHostKeyChecking no" naehas@#{drweb_host} "sed -i 's/#{search}/#{dbhost_new}/g' /usr/java/#{dashboard_dir}/conf/Catalina/localhost/dashboard.xml"`
+  `ssh -o "StrictHostKeyChecking no" naehas@#{drweb_host} "sed -i 's/#{search}/#{dbhost_new}/g' /usr/java/#{dashboard_dir}/webapps/dashboard/META-INF/context.xml"`
+  `ssh -o "StrictHostKeyChecking no" naehas@#{drweb_host} "sed -i 's/#{search}/#{dbhost_new}/g' /usr/java/#{dashboard_dir}/webapps/dashboard/WEB-INF/classes/naehas-hibernate-cmdline.xml"`
+  `ssh -o "StrictHostKeyChecking no" naehas@#{drweb_host} "sed -i 's/#{search}/#{dbhost_new}/g' /usr/java/#{dashboard_dir}/webapps/dashboard/WEB-INF/classes/naehas-dlc.properties"`
+  `ssh -o "StrictHostKeyChecking no" naehas@#{drweb_host} "sed -i 's/#{search}/#{dbhost_new}/g' /usr/java/#{dashboard_dir}/webapps/dashboard/WEB-INF/naehas-hibernate-cmdline.xml"`
+end
+
+def start_dashboard(drweb_host, dashboard_dir)
   `ssh -o "StrictHostKeyChecking no" naehas@#{drweb_host} "cd /usr/java/#{dashboard_dir};./bin/startup.sh"`
 end
 
@@ -108,6 +123,8 @@ puts "switching dr dashboards to drdb1 and drdb2"
 {% for (key, value) in drweb1.dashboard_dbhosts.iteritems() %}
 puts "switching {{ key }} to {{ value }}"
 switch_db_host("{{drweb1.ip}}", "{{ key }}", "{{ value }}")
+puts "starting up {{ key }}"
+start_dashboard("{{drweb1.ip}}", "{{ key }}")
 
 {% endfor %}
 
