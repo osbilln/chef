@@ -1,0 +1,75 @@
+[mysqld]
+user            = mysql
+socket          = /var/run/mysqld/mysqld.sock
+port            = 3306
+basedir         = /usr
+datadir         = /data1/mysql-data
+tmpdir          = /mysqltmp
+skip-external-locking = 1
+
+## Cache
+thread_cache_siz=16
+table_open_cache=2048
+table_definition_cache=512
+query_cache_size=128M
+query_cache_limit=1M
+
+# ------------------
+sort_buffer_size=8M
+read_buffer_size=1M
+read_rnd_buffer_size=8M
+join_buffer_size=3M
+
+
+# Default to using old password format for compatibility with mysql 3.x
+# clients (those using the mysqlclient10 compatibility package).
+old_passwords=1
+max_connections=600
+group_concat_max_len=16384
+max_allowed_packet = 100M
+
+# added 4/20/2010
+wait_timeout=360000
+
+thread_concurrency = 16
+
+# added 5/28/2008:
+max_heap_table_size=67108864
+tmp_table_size=67108864
+query_cache_size=33554432
+open-files-limit=20000
+
+key_buffer_size=16G
+myisam_sort_buffer_size=512M
+
+#Added by VP on 3/30/2012 (But havnt restarted DB)
+#key_buffer_size=20G
+#myisam_sort_buffer_size=1G
+#bulk_insert_buffer_size = 256M
+
+# Innodb parameters
+# added 5/25/2010: to accomadate more locks for innodb usage
+innodb_buffer_pool_size=6G
+innodb_log_file_size=200M
+innodb_file_per_table=1
+
+## Logging
+server-id=45
+log_bin = /mysqllogs/bin-log
+log_bin_index = /mysqllogs/bin-log.index
+relay-log = /mysqllogs/db5-relaylog
+expire_logs_days=30
+slow_query_log = 1
+slow_query_log_file = /mysqllogs/slow_query-db5.log
+long_query_time = 5
+log_error = /mysqllogs/mysqld-db5.log
+skip-slave-start
+
+[mysqld_safe]
+err-log=/mysqllogs/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+
+[mysqldump]
+quick
+quote-names
+max_allowed_packet  = 100M

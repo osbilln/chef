@@ -1,0 +1,72 @@
+[mysqld]
+socket          = /var/run/mysqld/mysqld.sock
+port            = 3306
+basedir         = /usr
+datadir         = /data1/mysql-data
+tmpdir          = /mysqltmp
+skip-external-locking = 1
+
+table_cache     = 2048
+thread_cache_size = 16
+back_log = 100
+max_connect_errors = 10000
+open-files-limit = 100000
+interactive_timeout = 28800
+wait_timeout = 360000
+
+max_connections = 400
+group_concat_max_len = 16384
+max_allowed_packet = 100M
+tmp_table_size = 64M
+max_heap_table_size = 64M
+query_cache_size = 32M
+sort_buffer_size = 8M
+read_buffer_size = 1M
+read_rnd_buffer_size = 8M
+join_buffer_size = 1M
+
+key_buffer              = 50G
+myisam_sort_buffer_size = 2048M
+bulk_insert_buffer_size = 1024M
+
+innodb_log_file_size = 200M
+innodb_buffer_pool_size = 16G
+innodb_flush_method = O_DIRECT
+innodb_file_per_table=1
+sync_binlog = 0
+skip-slave-start
+
+#log-slave-updates
+skip-slave-start
+expire_logs_days    = 30
+
+slow_query_log = 1
+long_query_time = 5
+log-slow-slave-statements=1
+
+user            = mysql
+basedir         = /usr
+max_binlog_size         = 100M
+
+#skipping errors
+#slave-skip-errors = 1146, 1049, 1051
+
+## Logging
+#Replication
+server-id               = 42
+log_bin         = /mysqllogs/bin-log
+log_bin_index = /mysqllogs/bin-log.index
+#relay-log = /mysqllogs/db2-relaylog
+slow_query_log = 1
+slow_query_log_file = /mysqllogs/slow_query-db2.log
+long_query_time = 5
+log_error = /mysqllogs/mysqld-db2.log
+
+[mysqld_safe]
+err-log=/mysqllogs/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+
+[mysqldump]
+quick
+quote-names
+max_allowed_packet  = 100M
