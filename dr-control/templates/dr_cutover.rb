@@ -128,4 +128,7 @@ start_dashboard("{{drweb1.ip}}", "{{ key }}")
 
 {% endfor %}
 
+puts "open up access to drdb1 and drdb2 port 3306 to drweb"
+`aws ec2 authorize-security-group-ingress --group-id {{ drdb1.sg }} --protocol tcp --port 3306 --source-group {{ drweb1.sg }}`
+
 puts "DR cutover complete, test dashboards and then cut DNS over to drweb1"

@@ -10,15 +10,18 @@
       ip: 172.16.98.21
       instance_id: i-98bd3841
       itype: m3.2xlarge
+      sg: sg-ba3099de
     drdb2:
       vol_id: vol-85d73244
       ip: 172.16.123.222
       instance_id: i-2ebd38f7
       itype: m3.2xlarge
+      sg: sg-ba3099de
     drweb1:
       itype: t2.large
       instance_id: i-91ce1b58
       ip: 172.16.3.12
+      sg: sg-66b21c02
       dashboard_dbhosts:
         citinew-dashboard: drdb2-slave.naehas.net
         comcastprod-dashboard: drdb2-slave.naehas.net
