@@ -12,9 +12,9 @@
       itype: m3.2xlarge
       sg: sg-ba3099de
     drdb2:
-      vol_id: vol-85d73244
-      ip: 172.16.123.222
-      instance_id: i-2ebd38f7
+      vol_id: vol-618493a1
+      ip: 172.16.103.151
+      instance_id: i-b97deb61
       itype: m3.2xlarge
       sg: sg-ba3099de
     drweb1:

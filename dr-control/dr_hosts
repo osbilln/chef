@@ -2,8 +2,8 @@
 172.16.118.160 ansible_connection=ssh ansible_user=ubuntu
 
 [drdb]
-172.16.98.21 ansible_connection=ssh ansible_user=ubuntu
-172.16.123.222 ansible_connection=ssh ansible_user=ubuntu
+172.16.108.163 ansible_connection=ssh ansible_user=ubuntu
+172.16.103.151 ansible_connection=ssh ansible_user=ubuntu
 
 [drweb]
 172.16.3.12 ansible_connection=ssh ansible_user=ubuntu
